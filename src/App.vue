@@ -1,8 +1,8 @@
 <script setup>
-import packageJson from "../package.json";
-import HpCalculator from "./components/HpCalculator.vue";
+import packageJson from '../package.json'
+import HpCalculator from './components/HpCalculator.vue'
 
-console.log("Current version is " + packageJson.version);
+console.log('Current version is ' + packageJson.version)
 </script>
 
 <template>

@@ -1,18 +1,18 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed } from 'vue'
 
-const hitDie = ref(0);
-const level = ref(1);
-const conModifier = ref(0);
+const hitDie = ref(0)
+const level = ref(1)
+const conModifier = ref(0)
 
 const totalHP = computed(() => {
-  if (hitDie.value === 0) return 0;
+  if (hitDie.value === 0) return 0
 
-  const firstLevelHP = hitDie.value + conModifier.value;
-  const subsequentLevelsHP = (level.value - 1) * (Math.floor(hitDie.value / 2) + 1 + conModifier.value);
+  const firstLevelHP = hitDie.value + conModifier.value
+  const subsequentLevelsHP = (level.value - 1) * (Math.floor(hitDie.value / 2) + 1 + conModifier.value)
 
-  return firstLevelHP + subsequentLevelsHP;
-});
+  return firstLevelHP + subsequentLevelsHP
+})
 </script>
 
 <template>
