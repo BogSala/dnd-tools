@@ -1,4 +1,6 @@
 <script setup>
+import { ref, computed } from "vue";
+
 const hitDie = ref(0);
 const level = ref(1);
 const conModifier = ref(0);

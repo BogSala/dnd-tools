@@ -15,7 +15,7 @@ console.log("Current version is " + packageJson.version);
   <main class="container">
     <div class="row">
       <div class="col-lg-12">
-        <HpCalculator/>
+        <HpCalculator />
       </div>
     </div>
   </main>

@@ -1,10 +1,14 @@
-import { defineConfig } from 'vite'
+import { defineConfig } from 'vite';
 import path from 'path';
-import vue from '@vitejs/plugin-vue'
+import vueDevTools from 'vite-plugin-vue-devtools';
+import vue from '@vitejs/plugin-vue';
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [
+    vueDevTools(),
+    vue()
+  ],
   base: '/dnd-tools/',
   resolve: {
     alias: {
@@ -14,7 +18,8 @@ export default defineConfig({
   css: {
     preprocessorOptions: {
       scss: {
-        additionalData: `@import "@/scss/global.scss";`
+        additionalData: `@use "@/scss/global.scss";`,
+        quietDeps: true,
       }
     }
   },
