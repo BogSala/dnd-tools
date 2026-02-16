@@ -4,14 +4,29 @@ import { ref, computed } from 'vue'
 const hitDie = ref(0)
 const level = ref(1)
 const conModifier = ref(0)
+const isTough = ref(false)
+const isHillDwarf = ref(false)
 
 const totalHP = computed(() => {
   if (hitDie.value === 0) return 0
 
-  const firstLevelHP = hitDie.value + conModifier.value
-  const subsequentLevelsHP = (level.value - 1) * (Math.floor(hitDie.value / 2) + 1 + conModifier.value)
+  let baseHP = hitDie.value + conModifier.value
 
-  return firstLevelHP + subsequentLevelsHP
+  if (level.value > 1) {
+    const avgDieRoll = Math.floor(hitDie.value / 2) + 1
+    baseHP += (level.value - 1) * (avgDieRoll + conModifier.value)
+  }
+
+  let bonusHP = 0
+  if (isTough.value) bonusHP += level.value * 2
+  if (isHillDwarf.value) bonusHP += level.value * 1
+
+  return baseHP + bonusHP
+})
+
+
+const avgPerLevel = computed(() => {
+  return level.value > 0 ? (totalHP.value / level.value).toFixed(1) : 0
 })
 </script>
 
@@ -26,8 +41,8 @@ const totalHP = computed(() => {
           <div class="row">
             <div class="col-8">
               <label for="charClass" class="form-label text-dark fw-bold">Character Class</label>
-              <select id="charClass" class="form-select">
-                <option selected>Choose class...</option>
+              <select id="charClass" v-model.number="hitDie" class="form-select">
+                <option value="0" selected>Choose class...</option>
                 <option value="12">Barbarian (d12)</option>
                 <option value="10">Fighter, Paladin, Ranger (d10)</option>
                 <option value="8">
@@ -39,7 +54,8 @@ const totalHP = computed(() => {
 
             <div class="col-2">
               <label for="charLevel" class="form-label text-dark fw-bold">Level</label>
-              <input type="number" id="charLevel" v-model.number="level" class="form-control" min="1" max="20" value="1">
+              <input type="number" id="charLevel" v-model.number="level" class="form-control" min="1" max="20"
+                value="1">
             </div>
 
             <div class="col-2">
@@ -48,10 +64,31 @@ const totalHP = computed(() => {
             </div>
           </div>
 
+          <div class="row justify-content-center mt-3">
+            <div class="col-8 justify-content-center d-flex gap-4">
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="toughFeat" v-model="isTough">
+                <label class="form-check-label fw-semibold" for="toughFeat">
+                  Tough Feat (+2 HP/lvl)
+                </label>
+              </div>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="hillDwarf" v-model="isHillDwarf">
+                <label class="form-check-label fw-semibold" for="hillDwarf">
+                  Hill Dwarf (+1 HP/lvl)
+                </label>
+              </div>
+            </div>
+
+            <div class="empty-placeholder col-4 bg-transparent">
+
+            </div>
+          </div>
+
         </div>
 
         <div class="col card text-bg-light">
-          <h5 class="card-header bg-transparent card-title">Results</h5>
+          <h5 class="card-header bg-transparent card-title text-center">Results</h5>
           <div class="card-body text-center">
             <p class="text-muted mb-1 small">Total Hit Points</p>
             <h2 class="display-4 fw-bold text-primary mb-0">{{ totalHP }}</h2>
