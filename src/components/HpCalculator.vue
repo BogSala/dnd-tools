@@ -10,10 +10,10 @@ const isHillDwarf = ref(false)
 const totalHP = computed(() => {
   if (hitDie.value === 0) return 0
 
-  let baseHP = hitDie.value + conModifier.value
+  let baseHP = Number(hitDie.value) + conModifier.value
 
   if (level.value > 1) {
-    const avgDieRoll = Math.floor(hitDie.value / 2) + 1
+    const avgDieRoll = Math.floor(Number(hitDie.value) / 2) + 1
     baseHP += (level.value - 1) * (avgDieRoll + conModifier.value)
   }
 
