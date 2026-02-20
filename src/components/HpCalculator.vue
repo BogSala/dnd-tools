@@ -38,9 +38,9 @@ const totalHP = computed(() => {
     </div>
     <div class="card-body">
       <div class="row">
-        <div class="col-8">
+        <div class="col-12 col-lg-8">
           <div class="row">
-            <div class="col-8">
+            <div class="col-12 col-lg-8 mb-2 mb-lg-0">
               <label for="charClass" class="form-label text-dark fw-bold">Character Class</label>
               <select id="charClass" v-model.number="hitDie" class="form-select">
                 <option value="0" selected>Choose class...</option>
@@ -53,21 +53,21 @@ const totalHP = computed(() => {
               </select>
             </div>
 
-            <div class="col-2">
+            <div class="col-6 col-lg-2">
               <label for="charLevel" class="form-label text-dark fw-bold">Level</label>
               <input type="number" id="charLevel" v-model.number="level" @blur="level = level || 1" class="form-control"
                 min="1" max="20" value="1">
             </div>
 
-            <div class="col-2">
+            <div class="col-6 col-lg-2">
               <label for="conMod" class="form-label text-dark fw-bold">CON Modifier</label>
               <input type="number" id="conMod" v-model.number="conModifier" @blur="conModifier = conModifier || 0"
                 class="form-control" value="1">
             </div>
           </div>
 
-          <div class="row justify-content-center mt-3">
-            <div class="col-8 justify-content-center d-flex gap-4">
+          <div class="row justify-content-center mt-3 mb-2 mb-lg-0">
+            <div class="col-lg-8 justify-content-center d-flex gap-md-4 gap-1 flex-column flex-md-row align-items-center">
               <div class="form-check form-switch">
                 <input class="form-check-input" type="checkbox" id="toughFeat" v-model="isTough">
                 <label class="form-check-label fw-semibold" for="toughFeat">
@@ -82,7 +82,7 @@ const totalHP = computed(() => {
               </div>
             </div>
 
-            <div class="empty-placeholder col-4 bg-transparent"></div>
+            <div class="empty-placeholder col-lg-4 col-0 bg-transparent"></div>
           </div>
 
         </div>
