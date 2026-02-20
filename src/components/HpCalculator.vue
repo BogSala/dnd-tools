@@ -1,6 +1,8 @@
 <script setup>
 import { ref, computed } from 'vue'
 
+const TOUGH_BONUS = 2
+const HILL_DWARF_BONUS = 1
 
 const hitDie = ref(0)
 const level = ref(1)
@@ -10,29 +12,36 @@ const isHillDwarf = ref(false)
 
 const averageRoll = computed(() =>  Math.floor(hitDie.value / 2) + 1)
 
+const additionalBonuses = computed(() => {
+  let gain = 0
+
+  if (isTough.value) gain += TOUGH_BONUS
+  if (isHillDwarf.value) gain += HILL_DWARF_BONUS
+
+  return gain
+}) 
+
 const hpPerLevel = computed(() => {
   if (hitDie.value === 0) return 0
-  return averageRoll.value + conModifier.value
+
+  let gain = averageRoll.value + Number(conModifier.value)
+  gain += additionalBonuses.value
+
+  return Math.max(gain, 1)
 })
+
+const firstLevelHp = computed(() => hitDie.value + Number(conModifier.value) + additionalBonuses.value)
 
 const totalHP = computed(() => {
   if (hitDie.value === 0 || level.value <= 0) return 0
+  if (level.value === 1) return firstLevelHp
 
-  const firstLevelHp = hitDie.value + conModifier.value
-  const baseHP = firstLevelHp + ((level.value - 1) * hpPerLevel.value)
-
-  let bonusHP = 0
-  if (isTough.value) bonusHP += level.value * 2
-  if (isHillDwarf.value) bonusHP += level.value * 1
-
-  return baseHP + bonusHP
+  return firstLevelHp.value + ((level.value - 1) * hpPerLevel.value)
 })
-
-
 </script>
 
 <template>
-  <section class="card shadow-sm mb-4">
+  <section class="card shadow-sm mb-4 hp-calculator">
     <div class="card-header bg-primary text-white">
       <h2 class="h5 mb-0">HP Calculator</h2>
     </div>
@@ -101,8 +110,8 @@ const totalHP = computed(() => {
                   class="w-auto d-inline p-0 cursor-pointer text-decoration-underline" 
                   data-bs-toggle="tooltip" data-bs-placement="top"
                   data-bs-custom-class="custom-tooltip" 
-                  :data-bs-title="`Hit Die (${hitDie}) + CON Modifier (${conModifier})`">
-                  {{ hitDie + conModifier }}
+                  :data-bs-title="`Hit Die (${hitDie}) + CON Modifier (${conModifier})` + (additionalBonuses > 0 ? ` + Bonuses (${additionalBonuses})` : '')">
+                  {{ hitDie + conModifier + additionalBonuses }}
                 </span>
               </div>
               <div class="row justify-content-center" v-if="level > 1">
@@ -110,7 +119,7 @@ const totalHP = computed(() => {
                 <span v-tooltip 
                   class="w-auto d-inline p-0 cursor-pointer text-decoration-underline" data-bs-toggle="tooltip"
                   data-bs-placement="top" data-bs-custom-class="custom-tooltip"
-                  :data-bs-title="`Average of hit die (${ averageRoll }) + CON Modifier (${conModifier})`">
+                  :data-bs-title="`Average (${averageRoll}) + CON Modifier (${conModifier})` + (additionalBonuses > 0 ? ` + Bonuses (${additionalBonuses})` : '')">
                   {{ hpPerLevel }}
                 </span>
               </div>
@@ -127,7 +136,11 @@ const totalHP = computed(() => {
 </template>
 
 <style scoped>
-  .cursor-pointer {
-    cursor: pointer;
-  }
+:global(.tooltip-inner) {
+  max-width: 300px !important;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
 </style>
