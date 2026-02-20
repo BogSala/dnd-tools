@@ -96,7 +96,7 @@ const totalHP = computed(() => {
             </div>
             <div class="additional-info col d-flex flex-column justify-content-center">
               <div class="row justify-content-center">
-                <span class="w-auto text-muted d-inline px-1">HP on first level: </span>
+                <span class="w-auto text-muted d-inline px-1">HP on 1st lvl: </span>
                 <span v-tooltip
                   class="w-auto d-inline p-0 cursor-pointer text-decoration-underline" 
                   data-bs-toggle="tooltip" data-bs-placement="top"
@@ -106,7 +106,7 @@ const totalHP = computed(() => {
                 </span>
               </div>
               <div class="row justify-content-center" v-if="level > 1">
-                <span class="w-auto text-muted d-inline px-1">HP on levels after first: </span>
+                <span class="w-auto text-muted d-inline px-1">Next lvls: </span>
                 <span v-tooltip 
                   class="w-auto d-inline p-0 cursor-pointer text-decoration-underline" data-bs-toggle="tooltip"
                   data-bs-placement="top" data-bs-custom-class="custom-tooltip"
