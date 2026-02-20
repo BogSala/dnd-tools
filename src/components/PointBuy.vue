@@ -2,40 +2,113 @@
 import { reactive, computed } from 'vue'
 
 const abilities = reactive([
-  { key: 'STR', name: 'Strength', value: 8 },
-  { key: 'DEX', name: 'Dexterity', value: 8 },
-  { key: 'CON', name: 'Constitution', value: 8 },
-  { key: 'INT', name: 'Intelligence', value: 8 },
-  { key: 'WIS', name: 'Wisdom', value: 8 },
-  { key: 'CHA', name: 'Charisma', value: 8 }
+  { key: 'STR', name: 'Strength', base: 8, racial: 0, feats: 0, custom: 0 },
+  { key: 'DEX', name: 'Dexterity', base: 8, racial: 0, feats: 0, custom: 0 },
+  { key: 'CON', name: 'Constitution', base: 8, racial: 0, feats: 0, custom: 0 },
+  { key: 'INT', name: 'Intelligence', base: 8, racial: 0, feats: 0, custom: 0 },
+  { key: 'WIS', name: 'Wisdom', base: 8, racial: 0, feats: 0, custom: 0 },
+  { key: 'CHA', name: 'Charisma', base: 8, racial: 0, feats: 0, custom: 0 }
 ])
 
-const totalPoints = 27
+const totalPointsPool = 27
 
-const spentPoints = computed(() => 0)
-const remainingPoints = computed(() => totalPoints)
+const spentPoints = computed(() => {
+  return abilities.reduce((acc, ab) => acc + (ab.base - 8), 0)
+})
 
-function increase(ability) {
-  console.log('increase', ability.key)
-}
+const remainingPoints = computed(() => totalPointsPool - spentPoints.value)
 
-function decrease(ability) {
-  console.log('decrease', ability.key)
+const abilityResults = computed(() => {
+  return abilities.map(ab => {
+    const total = ab.base + ab.racial + ab.feats
+    const mod = Math.floor((total - 10) / 2)
+    return { ...ab, total, mod: mod >= 0 ? `+${mod}` : mod }
+  })
+})
+
+function updateBase(key, delta) {
+  const ab = abilities.find(a => a.key === key)
+  if (ab) ab.base += delta
+  console.log(`${key} base updated by ${delta}`)
 }
 
 function resetAll() {
-  console.log('reset')
+  abilities.forEach(ab => {
+    ab.base = 8
+    ab.racial = 0
+    ab.feats = 0
+  })
 }
 </script>
 
 <template>
-  <section class="card shadow-sm mb-4 hp-calculator">
-    <div class="card-header bg-secondary text-white">
-      <h2 class="h5 mb-0">HP Calculator</h2>
-    </div>
-    <div class="card-body">
-    </div>
-  </section>
-</template>\
+  <div class="container py-5">
+    <section class="card shadow-sm border-0">
+      <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
+        <h2 class="h5 mb-0 text-uppercase fw-bold tracking-wider">Ability Score Calculator</h2>
+        <div class="badge bg-primary fs-6">
+          Points: {{ remainingPoints }} / {{ totalPointsPool }}
+        </div>
+      </div>
 
-<style scoped></style>
+      <div class="card-body p-0">
+        <div class="row g-0 bg-light text-muted small fw-bold text-uppercase p-3 border-bottom d-none d-md-flex">
+          <div class="col-md-3">Ability</div>
+          <div class="col-md-3 text-center">Base Score</div>
+          <div class="col-md-2 text-center">Racial / Feats / Custom</div>
+          <div class="col-md-2 text-center">Total</div>
+          <div class="col-md-2 text-center">Modifier</div>
+        </div>
+
+        <div v-for="ab in abilityResults" :key="ab.key" class="row g-0 p-3 border-bottom align-items-center hover-row">
+          <div class="col-12 col-md-3 mb-2 mb-md-0">
+            <div class="fw-bold">{{ ab.name }}</div>
+          </div>
+
+          <div class="col-6 col-md-3 text-center">
+            <div class="input-group input-group-sm justify-content-center">
+              <button @click="updateBase(ab.key, -1)" class="btn btn-outline-secondary" type="button">-</button>
+              <span class="input-group-text bg-white fw-bold px-3">{{ ab.base }}</span>
+              <button @click="updateBase(ab.key, 1)" class="btn btn-outline-secondary" type="button">+</button>
+            </div>
+          </div>
+
+          <div class="col-6 col-md-2 text-center">
+            <div class="d-flex gap-1 justify-content-center">
+              <span class="badge text-dark mx-3" title="Racial">+{{ ab.racial }}</span>
+              <span class="badge text-dark mx-3" title="Feats">+{{ ab.feats }}</span>
+              <span class="badge text-dark mx-3" title="Feats">+{{ ab.custom }}</span>
+            </div>
+          </div>
+
+          <div class="col-6 col-md-2 text-center mt-3 mt-md-0">
+            <div class="d-md-none small text-muted">Total</div>
+            <span class="h5 mb-0 fw-bold">{{ ab.total }}</span>
+          </div>
+
+          <div class="col-6 col-md-2 text-center mt-3 mt-md-0">
+            <div class="d-md-none small text-muted">Modifier</div>
+            <span class="badge bg-success fs-6">{{ ab.mod }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-footer bg-white text-end py-3">
+        <button @click="resetAll" class="btn btn-outline-danger btn-sm text-uppercase fw-bold">
+          Reset All Points
+        </button>
+      </div>
+    </section>
+  </div>
+</template>
+
+<style scoped>
+.hover-row:hover {
+  background-color: #f8f9fa;
+  transition: background-color 0.2s ease;
+}
+
+.tracking-wider {
+  letter-spacing: 0.05rem;
+}
+</style>
