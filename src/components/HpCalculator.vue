@@ -34,7 +34,7 @@ const firstLevelHp = computed(() => hitDie.value + Number(conModifier.value) + a
 
 const totalHP = computed(() => {
   if (hitDie.value === 0 || level.value <= 0) return 0
-  if (level.value === 1) return firstLevelHp
+  if (level.value === 1) return firstLevelHp.value
 
   return firstLevelHp.value + ((level.value - 1) * hpPerLevel.value)
 })
