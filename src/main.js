@@ -3,8 +3,12 @@ import './scss/styles.scss'
 import App from './App.vue'
 import * as bootstrap from 'bootstrap'
 import 'bootstrap'
+import FloatingVue from 'floating-vue'
+import 'floating-vue/dist/style.css'
 
 const app = createApp(App)
+
+app.use(FloatingVue)
 
 app.directive('tooltip', {
     mounted(el) {
