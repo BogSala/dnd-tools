@@ -1,21 +1,24 @@
 <script setup>
 import { ref, computed } from 'vue'
 
+
 const hitDie = ref(0)
 const level = ref(1)
 const conModifier = ref(0)
 const isTough = ref(false)
 const isHillDwarf = ref(false)
 
+const hpPerLevel = computed(() => {
+  if (totalHP.value <= 0)  return 0
+  const averageRoll = Math.floor(hitDie.value / 2) + 1
+  return averageRoll + conModifier.value
+})
+
 const totalHP = computed(() => {
-  if (hitDie.value === 0) return 0
+  if (hitDie.value === 0 || level.value <= 0) return 0
 
-  let baseHP = Number(hitDie.value) + conModifier.value
-
-  if (level.value > 1) {
-    const avgDieRoll = Math.floor(Number(hitDie.value) / 2) + 1
-    baseHP += (level.value - 1) * (avgDieRoll + conModifier.value)
-  }
+  const firstLevelHp = hitDie.value + conModifier.value
+  const baseHP = firstLevelHp + ((level.value - 1) * hpPerLevel.value)
 
   let bonusHP = 0
   if (isTough.value) bonusHP += level.value * 2
@@ -25,9 +28,6 @@ const totalHP = computed(() => {
 })
 
 
-const avgPerLevel = computed(() => {
-  return level.value > 0 ? (totalHP.value / level.value).toFixed(1) : 0
-})
 </script>
 
 <template>
@@ -54,13 +54,14 @@ const avgPerLevel = computed(() => {
 
             <div class="col-2">
               <label for="charLevel" class="form-label text-dark fw-bold">Level</label>
-              <input type="number" id="charLevel" v-model.number="level" class="form-control" min="1" max="20"
-                value="1">
+              <input type="number" id="charLevel" v-model.number="level" @blur="level = level || 1" class="form-control"
+                min="1" max="20" value="1">
             </div>
 
             <div class="col-2">
               <label for="conMod" class="form-label text-dark fw-bold">CON Modifier</label>
-              <input type="number" id="conMod" v-model.number="conModifier" class="form-control" value="1">
+              <input type="number" id="conMod" v-model.number="conModifier" @blur="conModifier = conModifier || 0"
+                class="form-control" value="1">
             </div>
           </div>
 
@@ -80,21 +81,38 @@ const avgPerLevel = computed(() => {
               </div>
             </div>
 
-            <div class="empty-placeholder col-4 bg-transparent">
-
-            </div>
+            <div class="empty-placeholder col-4 bg-transparent"></div>
           </div>
 
         </div>
 
         <div class="col card text-bg-light">
           <h5 class="card-header bg-transparent card-title text-center">Results</h5>
-          <div class="card-body text-center">
-            <p class="text-muted mb-1 small">Total Hit Points</p>
-            <h2 class="display-4 fw-bold text-primary mb-0">{{ totalHP }}</h2>
-            <p class="text-muted mt-2 small" v-if="hitDie > 0">
-              (Based on average rolls)
-            </p>
+          <div class="card-body text-center row">
+            <div class="hp-result col border-1 border-end border-dark-subtle">
+              <p class="text-muted mb-1 small">Total Hit Points</p>
+              <h2 class="display-4 fw-bold text-primary mb-0">{{ totalHP }}</h2>
+            </div>
+            <div class="additional-info col d-flex flex-column justify-content-center">
+              <div class="row justify-content-center">
+                <span class="w-auto text-muted d-inline">HP on first level: </span>
+                <span v-tooltip
+                  class="w-auto d-inline p-0 cursor-pointer" 
+                  data-bs-toggle="tooltip" data-bs-placement="top"
+                  data-bs-custom-class="custom-tooltip" 
+                  :data-bs-title="`Hit Die (${hitDie}) + CON Modifier (${conModifier})`">
+                  {{ hitDie + conModifier }}
+                </span>
+              </div>
+              <div class="row justify-content-center" v-if="level > 1">
+                <span class="w-auto text-muted d-inline">HP on levels after first: </span>
+                <span class="w-auto d-inline p-0">{{ hpPerLevel }}</span>
+              </div>
+          
+            </div>  
+              <p class="text-muted mt-2 small" v-if="hitDie > 0">
+                (Based on average rolls)
+              </p>
           </div>
         </div>
       </div>
