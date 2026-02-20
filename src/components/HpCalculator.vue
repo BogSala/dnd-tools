@@ -8,10 +8,11 @@ const conModifier = ref(0)
 const isTough = ref(false)
 const isHillDwarf = ref(false)
 
+const averageRoll = computed(() =>  Math.floor(hitDie.value / 2) + 1)
+
 const hpPerLevel = computed(() => {
-  if (totalHP.value <= 0)  return 0
-  const averageRoll = Math.floor(hitDie.value / 2) + 1
-  return averageRoll + conModifier.value
+  if (hitDie.value === 0) return 0
+  return averageRoll.value + conModifier.value
 })
 
 const totalHP = computed(() => {
@@ -95,9 +96,9 @@ const totalHP = computed(() => {
             </div>
             <div class="additional-info col d-flex flex-column justify-content-center">
               <div class="row justify-content-center">
-                <span class="w-auto text-muted d-inline">HP on first level: </span>
+                <span class="w-auto text-muted d-inline px-1">HP on first level: </span>
                 <span v-tooltip
-                  class="w-auto d-inline p-0 cursor-pointer" 
+                  class="w-auto d-inline p-0 cursor-pointer text-decoration-underline" 
                   data-bs-toggle="tooltip" data-bs-placement="top"
                   data-bs-custom-class="custom-tooltip" 
                   :data-bs-title="`Hit Die (${hitDie}) + CON Modifier (${conModifier})`">
@@ -105,8 +106,13 @@ const totalHP = computed(() => {
                 </span>
               </div>
               <div class="row justify-content-center" v-if="level > 1">
-                <span class="w-auto text-muted d-inline">HP on levels after first: </span>
-                <span class="w-auto d-inline p-0">{{ hpPerLevel }}</span>
+                <span class="w-auto text-muted d-inline px-1">HP on levels after first: </span>
+                <span v-tooltip 
+                  class="w-auto d-inline p-0 cursor-pointer text-decoration-underline" data-bs-toggle="tooltip"
+                  data-bs-placement="top" data-bs-custom-class="custom-tooltip"
+                  :data-bs-title="`Average of hit die (${ averageRoll }) + CON Modifier (${conModifier})`">
+                  {{ hpPerLevel }}
+                </span>
               </div>
           
             </div>  
@@ -119,3 +125,9 @@ const totalHP = computed(() => {
     </div>
   </section>
 </template>
+
+<style scoped>
+  .cursor-pointer {
+    cursor: pointer;
+  }
+</style>
