@@ -44,7 +44,7 @@ function resetAll() {
 <template>
   <section class="card shadow-sm border-0">
     <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center py-3">
-      <h2 class="h5 mb-0 text-uppercase fw-bold tracking-wider">Ability Score Calculator</h2>
+      <h2 class="h5 mb-0 tracking-wider">Ability Score Calculator</h2>
       <div class="badge bg-primary fs-6 btn-outline-secondary points">
         Points: {{ remainingPoints }} / {{ totalPointsPool }}
       </div>
@@ -104,10 +104,6 @@ function resetAll() {
 .hover-row:hover {
   background-color: #f8f9fa;
   transition: background-color 0.2s ease;
-}
-
-.tracking-wider {
-  letter-spacing: 0.05rem;
 }
 
 .additional-stats span:hover {
