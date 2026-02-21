@@ -10,33 +10,62 @@ const abilities = reactive([
   { key: 'CHA', name: 'Charisma', base: 8, racial: 0, feats: 0, custom: 0 }
 ])
 
-const totalPointsPool = 27
+const POINT_COST_MAP = {
+  8: 0,
+  9: 1,
+  10: 2,
+  11: 3,
+  12: 4,
+  13: 5,
+  14: 7,
+  15: 9
+}
+
+const STARTING_POINTS = 27
+const INITIAL_SCORE = 8
+const MODIFIER_BASE = 10
 
 const spentPoints = computed(() => {
-  return abilities.reduce((acc, ab) => acc + (ab.base - 8), 0)
+  return abilities.reduce((total, { base }) => {
+    const cost = POINT_COST_MAP[base] ?? 0
+    return total + cost
+  }, 0)
 })
 
-const remainingPoints = computed(() => totalPointsPool - spentPoints.value)
+const remainingPoints = computed(() => STARTING_POINTS - spentPoints.value)
 
 const abilityResults = computed(() => {
-  return abilities.map(ab => {
-    const total = ab.base + ab.racial + ab.feats
-    const mod = Math.floor((total - 10) / 2)
-    return { ...ab, total, mod: mod >= 0 ? `+${mod}` : mod }
+  return abilities.map(ability => {
+    const score = ability.base + ability.racial + ability.feats
+    const modifierValue = Math.floor((score - MODIFIER_BASE) / 2)
+
+    return {
+      ...ability,
+      total: score,
+      modifierString: modifierValue >= 0 ? `+${modifierValue}` : `${modifierValue}`
+    }
   })
 })
 
 function updateBase(key, delta) {
-  const ab = abilities.find(a => a.key === key)
-  if (ab) ab.base += delta
-  console.log(`${key} base updated by ${delta}`)
+  const ability = abilities.find(a => a.key === key)
+  if (!ability) return
+
+  const nextValue = ability.base + delta
+
+  if (nextValue >= 8 && nextValue <= 15) {
+    ability.base = nextValue
+  }
 }
 
 function resetAll() {
-  abilities.forEach(ab => {
-    ab.base = 8
-    ab.racial = 0
-    ab.feats = 0
+  abilities.forEach(ability => {
+    Object.assign(ability, {
+      base: INITIAL_SCORE,
+      racial: 0,
+      feats: 0,
+      custom: 0
+    })
   })
 }
 </script>
@@ -44,9 +73,14 @@ function resetAll() {
 <template>
   <section class="card shadow-sm border-0">
     <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center py-3">
-      <h2 class="h5 mb-0 tracking-wider">Ability Score Calculator</h2>
-      <div class="badge bg-primary fs-6 btn-outline-secondary points">
-        Points: {{ remainingPoints }} / {{ totalPointsPool }}
+      <h2 class="h5 mb-0 tracking-wider me-auto">Ability Score Calculator</h2>
+      <div class="points-data d-flex align-items-center gap-2">
+        <div class="badge bg-primary fs-6 btn-outline-secondary points">
+          Points: {{ remainingPoints }} / {{ STARTING_POINTS }}
+        </div>
+        <button @click="resetAll" class="btn btn-outline-primary btn-sm text-uppercase fw-bold">
+          Reset All Points
+        </button>
       </div>
     </div>
 
@@ -59,7 +93,8 @@ function resetAll() {
         <div class="col-md-2 text-center">Modifier</div>
       </div>
 
-      <div v-for="ab in abilityResults" :key="ab.key" class="row g-0 p-3 border-bottom align-items-center hover-row stat-table-body">
+      <div v-for="ab in abilityResults" :key="ab.key"
+        class="row g-0 p-3 border-bottom align-items-center hover-row stat-table-body">
         <div class="col-12 col-md-3 mb-2 mb-md-0 ps-5">
           <div>{{ ab.name }}</div>
         </div>
@@ -87,15 +122,9 @@ function resetAll() {
 
         <div class="col-6 col-md-2 text-center mt-3 mt-md-0">
           <div class="d-md-none small text-muted">Modifier</div>
-          <span class="btn pe-none bg-primary fs-6">{{ ab.mod }}</span>
+          <span class="btn pe-none bg-primary fs-6">{{ ab.modifierString }}</span>
         </div>
       </div>
-    </div>
-
-    <div class="card-footer bg-white text-end py-3">
-      <button @click="resetAll" class="btn btn-outline-danger btn-sm text-uppercase fw-bold">
-        Reset All Points
-      </button>
     </div>
   </section>
 </template>
@@ -108,10 +137,6 @@ function resetAll() {
 
 .additional-stats span:hover {
   color: white !important;
-}
-
-.points {
-  margin-right: 40px;
 }
 
 .stat-table-body div:not(:first-child) {
