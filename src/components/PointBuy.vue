@@ -1,5 +1,25 @@
 <script setup>
 import { reactive, computed } from 'vue'
+import {
+  POINT_COST_MAP,
+  INITIAL_SCORE,
+  STARTING_POINTS,
+  MODIFIER_BASE
+} from '@/data/pointRules.js'
+import StatBadgeEditor from './StatBadgeEditor.vue'
+
+function updateExtraStat(abilityKey, field, delta) {
+  const ability = abilities.find(a => a.key === abilityKey)
+  if (ability) {
+    ability[field] = ability[field] + delta
+  }
+}
+
+const extraFields = [
+  { key: 'racial', label: 'Racial Bonus' },
+  { key: 'feats', label: 'Feats' },
+  { key: 'custom', label: 'Custom Bonus' }
+]
 
 const abilities = reactive([
   { key: 'STR', name: 'Strength', base: 8, racial: 0, feats: 0, custom: 0 },
@@ -9,21 +29,6 @@ const abilities = reactive([
   { key: 'WIS', name: 'Wisdom', base: 8, racial: 0, feats: 0, custom: 0 },
   { key: 'CHA', name: 'Charisma', base: 8, racial: 0, feats: 0, custom: 0 }
 ])
-
-const POINT_COST_MAP = {
-  8: 0,
-  9: 1,
-  10: 2,
-  11: 3,
-  12: 4,
-  13: 5,
-  14: 7,
-  15: 9
-}
-
-const STARTING_POINTS = 27
-const INITIAL_SCORE = 8
-const MODIFIER_BASE = 10
 
 const spentPoints = computed(() => {
   return abilities.reduce((total, { base }) => {
@@ -108,10 +113,14 @@ function resetAll() {
         </div>
 
         <div class="col-6 col-md-2 text-center">
-          <div class="d-flex btn-group justify-content-center additional-stats">
-            <span class="badge text-dark btn btn-outline-secondary py-2" title="Racial">+{{ ab.racial }}</span>
-            <span class="badge text-dark btn btn-outline-secondary py-2" title="Feats">+{{ ab.feats }}</span>
-            <span class="badge text-dark btn btn-outline-secondary py-2" title="Feats">+{{ ab.custom }}</span>
+          <div class="d-flex btn-group justify-content-center gap-4 additional-stats">
+            <StatBadgeEditor 
+              v-for="field in extraFields" 
+              :key="field.key" 
+              :value="ab[field.key]" 
+              :title="field.label"
+              @update="(delta) => updateExtraStat(ab.key, field.key, delta)" 
+            />
           </div>
         </div>
 

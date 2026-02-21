@@ -10,7 +10,7 @@ const app = createApp(App)
 
 app.use(FloatingVue)
 
-app.directive('tooltip', {
+app.directive('bs-tooltip', {
     mounted(el) {
         new bootstrap.Tooltip(el)
     },
